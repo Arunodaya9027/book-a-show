@@ -1,0 +1,4 @@
+package com.capgemini.authservice.security;
+
+public class SecurityConfig {
+}

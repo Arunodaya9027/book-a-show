@@ -1,0 +1,4 @@
+package com.capgemini.authservice.request;
+
+public class AuthRequestDto {
+}
