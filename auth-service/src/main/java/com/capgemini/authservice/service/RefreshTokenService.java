@@ -28,14 +28,33 @@ public class RefreshTokenService {
 
     UserRepository userRepository;
 
-    public RefreshToken createRefreshToken(String username){
-        UserInfo userInfoExtracted = userRepository.findByUsername(username);
-        RefreshToken refreshToken = RefreshToken.builder()
-                .userInfo(userInfoExtracted)
-                .token(UUID.randomUUID().toString())
-                .expiryDate(Instant.now().plusMillis(600000))
-                .build();
-        return refreshTokenRepository.save(refreshToken);
+//    public RefreshToken createRefreshToken(String username){
+//        UserInfo userInfoExtracted = userRepository.findByUsername(username);
+//        RefreshToken refreshToken = RefreshToken.builder()
+//                .userInfo(userInfoExtracted)
+//                .token(UUID.randomUUID().toString())
+//                .expiryDate(Instant.now().plusMillis(600000))
+//                .build();
+//        return refreshTokenRepository.save(refreshToken);
+//    }
+
+    public RefreshToken getOrCreateRefreshToken(String username) {
+        UserInfo userInfo = userRepository.findByUsername(username);
+
+        return refreshTokenRepository.findByUserInfo(userInfo)
+                .map(existingToken -> {
+                    existingToken.setToken(UUID.randomUUID().toString()); // Generate new token value
+                    existingToken.setExpiryDate(Instant.now().plusMillis(600000)); // Update expiry date
+                    return refreshTokenRepository.save(existingToken); // Save updated token
+                })
+                .orElseGet(() -> {  // Create a new token if none exists
+                    RefreshToken refreshToken = RefreshToken.builder()
+                            .userInfo(userInfo)
+                            .token(UUID.randomUUID().toString())
+                            .expiryDate(Instant.now().plusMillis(600000))
+                            .build();
+                    return refreshTokenRepository.save(refreshToken);
+                });
     }
 
 //    public Optional<RefreshToken> findByToken(String token){

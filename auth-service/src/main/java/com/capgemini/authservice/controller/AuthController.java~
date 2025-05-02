@@ -69,7 +69,7 @@ public class AuthController
             if (authentication.isAuthenticated()) {
                 UserDetails userDetails = (UserDetails) authentication.getPrincipal();
                 String accessToken = jwtService.generateToken(userDetails);
-                RefreshToken refreshToken = refreshTokenService.getOrCreateRefreshToken(authRequestDTO.getUsername());
+                RefreshToken refreshToken = refreshTokenService.createRefreshToken(authRequestDTO.getUsername());
 
                 // Create a custom response object to include more details
                 JwtResponseDto response = new JwtResponseDto(accessToken, refreshToken.getToken(), userDetails.getUsername(), "Login successful!");  // Include username and message

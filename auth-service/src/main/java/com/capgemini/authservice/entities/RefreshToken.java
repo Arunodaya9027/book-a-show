@@ -32,6 +32,6 @@ public class RefreshToken {
 //    One user can have one refresh token
 //    One refresh token can have one user
     @OneToOne
-    @JoinColumn(name = "id", referencedColumnName = "user_id")
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private UserInfo userInfo;
 }
