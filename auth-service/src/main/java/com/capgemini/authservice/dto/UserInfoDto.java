@@ -7,15 +7,19 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
+import java.util.Set;
+
 @Getter @Setter @AllArgsConstructor @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class UserInfoDto  extends UserInfo {
+public class UserInfoDto   {
 
-    private String userName;
+    private String username;
 
     private String lastName;
     private long phoneNumber;
     private String email;
+    private String password;
+
 
 
 }

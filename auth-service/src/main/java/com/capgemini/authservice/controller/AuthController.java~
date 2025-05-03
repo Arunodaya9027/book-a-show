@@ -5,6 +5,7 @@ import com.capgemini.authservice.entities.RefreshToken;
 import com.capgemini.authservice.request.AuthRequestDto;
 import com.capgemini.authservice.request.RefreshTokenRequestDto;
 import com.capgemini.authservice.response.JwtResponseDto;
+import com.capgemini.authservice.response.TokenResponseDto;
 import com.capgemini.authservice.service.JwtService;
 import com.capgemini.authservice.service.RefreshTokenService;
 import com.capgemini.authservice.service.UserDetailsServiceImpl;
@@ -12,6 +13,7 @@ import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,10 +21,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
@@ -69,7 +68,7 @@ public class AuthController
             if (authentication.isAuthenticated()) {
                 UserDetails userDetails = (UserDetails) authentication.getPrincipal();
                 String accessToken = jwtService.generateToken(userDetails);
-                RefreshToken refreshToken = refreshTokenService.createRefreshToken(authRequestDTO.getUsername());
+                RefreshToken refreshToken = refreshTokenService.getOrCreateRefreshToken(authRequestDTO.getUsername());
 
                 // Create a custom response object to include more details
                 JwtResponseDto response = new JwtResponseDto(accessToken, refreshToken.getToken(), userDetails.getUsername(), "Login successful!");  // Include username and message
@@ -110,9 +109,69 @@ public class AuthController
     }
 
 
-@GetMapping("/check")
+
+
+//    @PostMapping("/validateToken")
+//    public ResponseEntity<?> validateToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
+//        try {
+//            String jwt = authHeader.substring(7); // Extract JWT (remove "Bearer ")
+//
+//            // 1. Validate Token Signature and Expiry (important!)
+////            jwtService.validateToken(jwt); // Use your JwtService to check signature and expiry
+//
+//            // 2. Retrieve Username from JWT
+//            String username = jwtService.extractUsername(jwt); // Extract username from JWT
+//
+//            // 3. Retrieve UserDetails from your database (or user store)
+//            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+//
+//
+//            // 4. (Optional but Recommended) Validate username matches and token isn't expired again in UserDetails context (in case UserDetails changed since token creation)
+//            if (!jwtService.validateToken(jwt, userDetails)){
+//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid JWT or User Details"); // Optional validation step for enhanced security.
+//            }
+//
+//            return ResponseEntity.ok(userDetails); // Return UserDetails if everything checks out
+//
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token in auth header"); // Or return more specific error information as needed
+//        }
+//    }
+
+
+// ... (rest of your controller code)
+
+
+@PostMapping("/validateToken")
+public ResponseEntity<TokenResponseDto> validateToken(@RequestHeader("Authorization") String authHeader) {
+    try {
+        String token = authHeader.substring(7); // Remove "Bearer "
+        String username = jwtService.extractUsername(token);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+        if (jwtService.validateToken(token, userDetails)) {
+            return ResponseEntity.ok(new TokenResponseDto(true, username, "Valid token"));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new TokenResponseDto(false, null, "Invalid token"));
+        }
+
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new TokenResponseDto(false, null, "Token validation failed"));
+    }
+}
+
+
+
+    @GetMapping("admin/check")
     public String check() {
-        return "Working";
+        return "Working Admin";
+    }
+
+    @GetMapping("user/check")
+    public String checkUser() {
+        return "Working User";
     }
 
 
