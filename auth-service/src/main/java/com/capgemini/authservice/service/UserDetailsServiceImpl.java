@@ -5,6 +5,7 @@ package com.capgemini.authservice.service;
 
 import com.capgemini.authservice.dto.UserInfoDto;
 import com.capgemini.authservice.entities.UserInfo;
+import com.capgemini.authservice.entities.UserRole;
 import com.capgemini.authservice.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 @Component
@@ -29,6 +31,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
     private final PasswordEncoder passwordEncoder;
+
 
 
 
@@ -55,6 +58,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             return false;
         }
         String userId = UUID.randomUUID().toString();
+
+
         userRepository.save(new UserInfo(userId, userInfoDto.getUsername(), userInfoDto.getPassword(),userInfoDto.getEmail(), new HashSet<>()));
 
 //        UserRegistrationMessage message = new UserRegistrationMessage();
