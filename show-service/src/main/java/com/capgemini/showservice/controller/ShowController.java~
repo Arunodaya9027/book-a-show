@@ -1,0 +1,49 @@
+package com.capgemini.showservice.controller;
+
+import com.capgemini.showservice.dto.ShowRequest;
+import com.capgemini.showservice.dto.ShowResponse;
+import com.capgemini.showservice.service.IShowService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/shows")
+@RequiredArgsConstructor
+@Tag(name = "Show Controller", description = "Endpoints for managing shows")
+public class ShowController {
+
+    private final IShowService showService;
+
+    @PostMapping
+    @Operation(summary = "Create a new show", description = "Allows ADMIN or OWNER to create a new show")
+//    @PreAuthorize("hasRole('OWNER') or hasRole('ADMIN')")
+    public ResponseEntity<ShowResponse> createShow(@Valid @RequestBody ShowRequest request) {
+        return ResponseEntity.ok(showService.createShow(request));
+    }
+
+    @GetMapping("/movie/{movieId}")
+    @Operation(summary = "Get all shows by movie ID")
+    public ResponseEntity<List<ShowResponse>> getByMovie(@PathVariable Long movieId) {
+        return ResponseEntity.ok(showService.getShowsByMovieId(movieId));
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get show by ID")
+    public ResponseEntity<ShowResponse> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(showService.getShowById(id));
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a show by ID", description = "Only accessible by ADMIN or OWNER")
+//    @PreAuthorize("hasRole('OWNER') or hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteShow(@PathVariable Long id) {
+        showService.deleteShow(id);
+        return ResponseEntity.noContent().build();
+    }
+}

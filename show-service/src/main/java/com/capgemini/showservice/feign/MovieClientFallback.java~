@@ -1,0 +1,13 @@
+package com.capgemini.showservice.feign;
+
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class MovieClientFallback implements MovieClient {
+
+    @Override
+    public String getMovieName(Long id) {
+        return "Movie Unavailable"; 
+    }
+}
