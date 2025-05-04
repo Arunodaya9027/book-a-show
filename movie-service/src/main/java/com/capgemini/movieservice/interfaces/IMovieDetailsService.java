@@ -1,6 +1,7 @@
 package com.capgemini.movieservice.interfaces;
 
 import com.capgemini.movieservice.dto.MovieInfoDto;
+import com.capgemini.movieservice.dto.MovieShortInfoDto;
 
 import java.util.List;
 
@@ -11,11 +12,11 @@ public interface IMovieDetailsService {
 
     MovieInfoDto getMovieDetailsByName(String movieName);
 
-    List<MoviesShortInfoDto> getAllMovies();
+    List<MovieShortInfoDto> getAllMovies();
 
-    MovieInfoDto addMovie(String movieInfoDto);
+    MovieInfoDto addMovie(MovieInfoDto movieInfoDto);
 
-    MovieInfoDto updateMovie(String movieInfoDto);
+    MovieInfoDto updateMovie(MovieInfoDto movieInfoDto);
 
     String deleteMovie(String movieId);
 }
