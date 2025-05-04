@@ -11,7 +11,7 @@ public interface IMovieDetailsService {
 
     MovieInfoDto getMovieDetailsByName(String movieName);
 
-    List<MoviesShortInfoDto> getAllMovies();
+//    List<MoviesShortInfoDto> getAllMovies();
 
     MovieInfoDto addMovie(String movieInfoDto);
 

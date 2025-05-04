@@ -30,11 +30,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    @Autowired
+
     private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private UserRoleRepository userRoleRepository;
+    private final UserRoleRepository userRoleRepository;
+
 
 
 
@@ -54,35 +54,37 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return userRepository.findByUsername(userInfoDto.getUsername());
     }
 
-    public Boolean signupUser(UserInfoDto userInfoDto){
+    public Boolean signupUser(UserInfoDto userInfoDto) {
         //        ValidationUtil.validateUserAttributes(userInfoDto);
         userInfoDto.setPassword(passwordEncoder.encode(userInfoDto.getPassword()));
-        if(Objects.nonNull(checkIfUserAlreadyExist(userInfoDto))){
+        if (Objects.nonNull(checkIfUserAlreadyExist(userInfoDto))) {
             return false;
         }
         String userId = UUID.randomUUID().toString();
-        Set<UserRole> userRoles = new HashSet<>();
-        for (String roleName : userInfoDto.getRoles()) {  // Iterate through role names from the DTO
-            UserRole role = userRoleRepository.findByRoleName(UserRole.RoleName.valueOf(roleName));
-            if (role != null) {
-                userRoles.add(role);
-            } else {
-                // Handle the case where the role is not found (throw exception or create a default role)
-                //  For this example, we throw an exception
-                throw new IllegalArgumentException("Role '" + roleName + "' not found.");
+        // Assign default role USER
+//        UserRole defaultRole = userRoleRepository.findByRoleName(UserRole.RoleName.USER);
+//        Set<UserRole> roles = new HashSet<>();
+//        roles.add(defaultRole);
+
+
+        Set<UserRole> roles = new HashSet<>();
+
+        if (userInfoDto.getRoles() == null || userInfoDto.getRoles().isEmpty()) {
+            // default role
+            roles.add(userRoleRepository.findByRoleName(UserRole.RoleName.USER));
+        } else {
+            for (String role : userInfoDto.getRoles()) {
+                UserRole.RoleName roleName = UserRole.RoleName.valueOf(role.toUpperCase());
+                UserRole foundRole = userRoleRepository.findByRoleName(roleName);
+                if (foundRole != null) {
+                    roles.add(foundRole);
+                }
             }
+
+            userRepository.save(new UserInfo(userId, userInfoDto.getUsername(), userInfoDto.getPassword(), userInfoDto.getEmail(), roles));
+
+
+            return true;
         }
 
-        userRepository.save(new UserInfo(userId, userInfoDto.getUsername(), userInfoDto.getPassword(),userInfoDto.getEmail(), new HashSet<>()));
-
-//        UserRegistrationMessage message = new UserRegistrationMessage();
-//        message.setUsername(userInfoDto.getUsername());
-//        message.setEmail(userInfoDto.getEmail());
-//        // Set other fields
-//
-//        messageProducer.sendMessage(gson.toJson(message)); // Send JSON string
-
-        return true;
     }
-
-}

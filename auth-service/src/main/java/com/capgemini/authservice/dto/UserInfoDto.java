@@ -19,6 +19,8 @@ public class UserInfoDto   {
     private long phoneNumber;
     private String email;
     private String password;
+    private Set<String> roles;
+
 
 
 
