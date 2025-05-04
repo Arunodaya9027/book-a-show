@@ -1,0 +1,69 @@
+package com.capgemini.gatewayservice.filter;
+
+
+import com.capgemini.gatewayservice.util.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+
+import java.util.List;
+
+@Component
+public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
+
+    @Autowired
+    private RouteValidator validator;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    public AuthenticationFilter() {
+        super(Config.class);
+    }
+
+    @Override
+    public GatewayFilter apply(Config config) {
+        return (exchange, chain) -> {
+            if (validator.isSecured.test(exchange.getRequest())) {
+
+                String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+                if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                    return onError(exchange, "Missing or invalid Authorization header", HttpStatus.UNAUTHORIZED);
+                }
+
+                String token = authHeader.substring(7);
+                if (!jwtUtil.validateToken(token)) {
+                    return onError(exchange, "Invalid or expired token", HttpStatus.UNAUTHORIZED);
+                }
+
+//                // Extract roles from JWT
+//                List<String> roles = jwtUtil.extractRoles(token);
+//                String path = exchange.getRequest().getURI().getPath();
+//
+//                // Role-based access control
+//                if (path.startsWith("/admin") && !roles.contains("ROLE_ADMIN")) {
+//                    return onError(exchange, "Access denied: Admin role required", HttpStatus.FORBIDDEN);
+//                }
+//
+//                if (path.startsWith("/user") && !roles.contains("ROLE_USER")) {
+//                    return onError(exchange, "Access denied: User role required", HttpStatus.FORBIDDEN);
+//                }
+            }
+
+            return chain.filter(exchange);
+        };
+    }
+
+    private Mono<Void> onError(org.springframework.web.server.ServerWebExchange exchange, String err, HttpStatus status) {
+        ServerHttpResponse response = exchange.getResponse();
+        response.setStatusCode(status);
+        return response.setComplete();
+    }
+
+    public static class Config {}
+}

@@ -1,7 +1,6 @@
 package com.capgemini.movieservice.interfaces;
 
 import com.capgemini.movieservice.dto.MovieInfoDto;
-import com.capgemini.movieservice.dto.MovieShortInfoDto;
 
 import java.util.List;
 
