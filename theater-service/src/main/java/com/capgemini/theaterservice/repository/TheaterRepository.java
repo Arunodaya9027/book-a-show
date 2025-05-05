@@ -9,12 +9,12 @@ import org.springframework.data.jpa.repository.Query;
 import com.capgemini.theaterservice.entities.TheaterDetails;
 
 public interface TheaterRepository extends JpaRepository<TheaterDetails, Long> {
-	@Query(value = "SELECT * FROM TheaterDetails t WHERE t.theaterName = :theaterName", nativeQuery = true)
+	@Query(value = "SELECT * FROM theater_details t WHERE LOWER(t.theater_name) LIKE CONCAT('%', LOWER(:theaterName), '%')", nativeQuery = true)
 	List<TheaterDetails> findByTheaterName(String theaterName);
 
-    @Query(value = "SELECT * FROM TheaterDetails t WHERE t.theater_id = :theaterId", nativeQuery = true)
+    @Query(value = "SELECT * FROM theater_details t WHERE t.theater_id = :theaterId", nativeQuery = true)
     Optional<TheaterDetails> findById(Long theaterId);
     
-    @Query(value = "SELECT * FROM TheaterDetails t WHERE t.location = :location", nativeQuery = true)
+    @Query(value = "SELECT * FROM theater_details t WHERE LOWER(t.location) LIKE CONCAT('%', LOWER(:location), '%')", nativeQuery = true)
 	List<TheaterDetails> findByLocation(String location);
 }

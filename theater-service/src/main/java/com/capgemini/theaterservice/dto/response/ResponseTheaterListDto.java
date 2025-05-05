@@ -2,8 +2,7 @@ package com.capgemini.theaterservice.dto.response;
 
 import java.util.List;
 
-import com.capgemini.theaterservice.dto.TheaterDetailsDto;
-
+import com.capgemini.theaterservice.dto.request.TheaterRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,5 +15,5 @@ import lombok.Setter;
 public class ResponseTheaterListDto {
 	private String message;
 	private int status;
-	private List<TheaterDetailsDto> theaterDetailsDto;
+	private List<TheaterRequestDto> theaterDetailsDto;
 }

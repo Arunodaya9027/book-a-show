@@ -9,8 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TheaterDetailsDto {
-	private String name;
-    private String location;
+public class ScreenDto {
+    private int screenNumber;
     private int capacity;
 }
