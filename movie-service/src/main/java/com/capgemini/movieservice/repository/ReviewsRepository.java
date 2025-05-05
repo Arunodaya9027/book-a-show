@@ -2,7 +2,6 @@ package com.capgemini.movieservice.repository;
 
 import com.capgemini.movieservice.entities.Reviews;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
